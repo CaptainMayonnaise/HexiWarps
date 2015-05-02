@@ -1,0 +1,35 @@
+name: Warps
+main: com.hexicraft.warps.Warps
+version: 1.0
+description: A warps plugin
+commands:
+    warp:
+        description: Teleports the player to a warp location.
+        usage: /warp [warp name]
+        permission: warps.user
+        permission-message: You don't have permission to do this.
+        aliases: [hexiwarp]
+    createwarp:
+        description: Creates a warp location.
+        usage: /createwarp [warp name]
+        permission: warps.user
+        permission-message: You don't have permission to do this.
+        aliases: [setwarp]
+    delwarp:
+        description: Deletes a warp location.
+        usage: /delwarp [warp name]
+        permission: warps.user
+        permission-message: You don't have permission to do this.
+        aliases: [remwarp, rmwarp, deletewarp]
+    mywarps:
+        description: List yours, or another player's warps.
+        usage: /mywarps <player name>
+        permission: warps.user
+        permission-message: You don't have permission to do this.
+        aliases: [warps]
+    ownedby:
+        description: Find the owner of a warp.
+        usage: /ownedby [warp name]
+        permission: warps.user
+        permission-message: You don't have permission to do this.
+        aliases: [getowner, findowner, lookupowner, getcreator, findcreator, lookupcreator, createdby]
