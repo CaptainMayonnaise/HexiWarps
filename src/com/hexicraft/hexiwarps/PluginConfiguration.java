@@ -1,4 +1,4 @@
-package com.hexicraft.warps;
+package com.hexicraft.hexiwarps;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;

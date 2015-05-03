@@ -1,4 +1,4 @@
-package com.hexicraft.warps;
+package com.hexicraft.hexiwarps;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * @author Ollie
  * @version %I%, %G%
  */
-public class Warps extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin implements Listener {
 
     private PluginConfiguration config = new PluginConfiguration(this);
     private MySQLInterface mySQL;
@@ -35,7 +35,7 @@ public class Warps extends JavaPlugin implements Listener {
             mySQL.tryCreateTable();
             getLogger().info("Warps enabled.");
         } catch (SQLException e) {
-            getLogger().warning("A database error has occured enabling warps: ");
+            getLogger().warning("A database error has occured enabling hexiwarps: ");
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
         }

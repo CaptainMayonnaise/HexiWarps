@@ -1,4 +1,4 @@
-package com.hexicraft.warps;
+package com.hexicraft.hexiwarps;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -39,36 +39,6 @@ public class MySQLInterface {
             e.printStackTrace();
         }
     }
-
-    /*private ArrayList<Warp> executeQuery(String query) throws SQLException {
-        Connection connection = null;
-        ArrayList<Warp> warps = new ArrayList<>();
-        try {
-            connection = createConnection();
-            Statement statement = connection.createStatement();
-
-            ResultSet result = statement.executeQuery(query);
-
-            while (result.next()) {
-                warps.add(new Warp(
-                        result.getInt("id"),
-                        result.getString("name"),
-                        result.getDouble("x"),
-                        result.getDouble("y"),
-                        result.getDouble("z"),
-                        result.getFloat("yaw"),
-                        result.getFloat("pitch"),
-                        result.getString("world"),
-                        result.getString("uuid")
-                ));
-            }
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
-        }
-        return warps;
-    }*/
 
     private ArrayList<Warp> executeQuery(String query) throws SQLException {
         try (Connection connection = createConnection()) {
@@ -219,12 +189,12 @@ public class MySQLInterface {
      * @throws java.sql.SQLException
      */
     public boolean reachedMaxWarps(Player player) throws SQLException {
-        if (player.hasPermission("warps.mod") || player.hasPermission("warps.admin")) {
+        if (player.hasPermission("hexiwarps.mod") || player.hasPermission("hexiwarps.admin")) {
             return false; //Mods and Admins have unlimited warps
         } else {
             int maxWarps = 0;
-            for (int i = MAX_PERMISSION; i > 0; i--) { //Check warps.max.i from top to bottom
-                if (player.hasPermission("warps.max." + i)) {
+            for (int i = MAX_PERMISSION; i > 0; i--) { //Check hexiwarps.max.i from top to bottom
+                if (player.hasPermission("hexiwarps.max." + i)) {
 
                     maxWarps = i; //If permission is found, set maxWarps and break out
                     break;
@@ -238,7 +208,7 @@ public class MySQLInterface {
 
     public boolean canEditWarp(Player player, String name) throws SQLException {
         ArrayList<Warp> results = executeQuery(String.format("SELECT * FROM warps WHERE uuid LIKE '%s' AND name LIKE '%s'", player.getUniqueId().toString(), name));
-        return !results.isEmpty() || player.hasPermission("warps.mod") || player.hasPermission("warps.admin");
+        return !results.isEmpty() || player.hasPermission("hexiwarps.mod") || player.hasPermission("hexiwarps.admin");
     }
 
     public ReturnCode delWarp(Player player, String[] args) throws SQLException {
@@ -306,29 +276,4 @@ public class MySQLInterface {
                 "uuid VARCHAR(36))"
         );
     }
-
-    /*private void uuidUpdate() throws SQLException { //TABLE METHOD FUNCTION
-        try {
-            executeUpdate("ALTER TABLE warps ADD uuid VARCHAR(36)");
-            Connection connection = null;
-            try {
-                connection = createConnection();
-                Statement statement = connection.createStatement();
-
-                ResultSet result = statement.executeQuery("SELECT * FROM HexiAdmin");
-                while (result.next()) {
-                    executeUpdate("UPDATE " + dbName + ".warps SET uuid='" + result.getString("uuid") +
-                            "', player='' WHERE player='" + result.getString("name") +"'");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException ignored) {
-
-        }
-    }*/
 }
