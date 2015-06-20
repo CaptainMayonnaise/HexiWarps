@@ -1,5 +1,6 @@
 package com.hexicraft.hexiwarps;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ public class MySQLInterface {
     private String password;
 
     private static final int MAX_PERMISSION = 10;
+    private static final int WARPS_PER_PAGE = 36;
 
     public MySQLInterface(String address, String port, String dbName, String userName, String password) {
         try {
@@ -221,41 +223,57 @@ public class MySQLInterface {
         }
     }
 
-    public ReturnCode listWarps(Player player) throws SQLException {
+    public ReturnCode listWarps(Player player, int page) throws SQLException {
         ArrayList<Warp> results = executeQuery("SELECT * FROM warps ORDER BY name ASC");
         if (!results.isEmpty()) {
-            String list = ChatColor.GOLD + "Warps: " + ChatColor.WHITE + results.get(0).getName();
-            player.sendMessage(generateList(results, list));
-            return ReturnCode.SUCCESS;
+            String title = ChatColor.GOLD + "Warps:";
+            return sendList(results, page, title, player);
         } else {
             return ReturnCode.NO_WARPS_CREATED;
         }
     }
 
-    public ReturnCode listWarps(Player player, String playerName) throws SQLException {
+    public ReturnCode listWarps(Player player, String playerName, int page) throws SQLException {
         Map<String, String> playerData = getUuid(playerName);
         ArrayList<Warp> results = executeQuery(String.format("SELECT * FROM warps WHERE uuid LIKE '%s' ORDER BY name ASC", playerData.get("uuid")));
         if (!results.isEmpty()) {
-            String list = ChatColor.GOLD + playerData.get("name") + "'s warps: " + ChatColor.WHITE + results.get(0).getName();
-            player.sendMessage(generateList(results, list));
-            return ReturnCode.SUCCESS;
+            return sendList(results, page, ChatColor.GOLD + playerData.get("name") + "'s warps:", player);
         } else {
             return ReturnCode.NO_WARPS_PLAYER;
         }
     }
 
-    public String generateList(ArrayList<Warp> results, String list) throws SQLException {
-        for (int warp = 1; warp < results.size(); warp++) {
+    public ReturnCode sendList(ArrayList<Warp> results, int page, String title, Player player) throws SQLException {
+        int maxPage = results.size() / WARPS_PER_PAGE;
+        if (results.size() % WARPS_PER_PAGE != 0) {
+            maxPage++;
+        }
+        if (page > maxPage) { // Any page above the max page is the same as maxpage
+            page = maxPage;
+        } else if (page < 1) { // Any page below 1 is the same as 1
+            page = 1;
+        }
+        player.sendMessage(ChatColor.DARK_GRAY + "- - - " +
+                title + ChatColor.WHITE + " Page " + page + "/" + maxPage +
+                ChatColor.DARK_GRAY + " - - -");
+        page -= 1; // Page starts at 1 not 0
+        int firstResult = page * WARPS_PER_PAGE;
+        String list =  results.get(firstResult).getName();
+        for (int warp = firstResult + 1;
+             warp < results.size() && warp < firstResult + WARPS_PER_PAGE;
+             warp++) {
             list += ", " + results.get(warp).getName();
         }
-        return list;
+        player.sendMessage(list);
+        return ReturnCode.SUCCESS;
     }
 
     public ReturnCode ownedBy(Player player, String[] args) throws SQLException {
         ArrayList<Warp> results = executeQuery(String.format("SELECT * FROM warps WHERE name LIKE '%s'", args[0]));
         if (!results.isEmpty()) {
             Map<String, String> playerData = getPlayer(results.get(0).getUuid());
-            player.sendMessage(ChatColor.GOLD + "Warp '" + args[0] + "' owned by: " + ChatColor.WHITE + playerData.get("name"));
+            player.sendMessage(ChatColor.GOLD + "Warp '" + ChatColor.WHITE + args[0] + ChatColor.GOLD +
+                    "' owned by: " + ChatColor.WHITE + playerData.get("name") + ChatColor.GOLD + ".");
             return ReturnCode.SUCCESS;
         } else {
             return ReturnCode.WARP_NOT_FOUND;

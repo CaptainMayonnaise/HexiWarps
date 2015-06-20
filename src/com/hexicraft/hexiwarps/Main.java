@@ -1,6 +1,7 @@
 package com.hexicraft.hexiwarps;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,20 +50,26 @@ public class Main extends JavaPlugin implements Listener {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             switch (cmd.getName().toLowerCase()) {
+                case "hexiwarps":
+                    code = hexiwarps(player);
+                    break;
                 case "warp":
                     code = warp(player, args);
                     break;
-                case "createwarp":
-                    code = createWarp(player, args);
+                case "setwarp":
+                    code = setwarp(player, args);
                     break;
                 case "delwarp":
-                    code = delWarp(player, args);
-                    break;
-                case "mywarps":
-                    code = myWarps(player, args);
+                    code = delwarp(player, args);
                     break;
                 case "ownedby":
                     code = ownedBy(player, args);
+                    break;
+                case "listwarps":
+                    code = listwarps(player, args);
+                    break;
+                case "playerswarps":
+                    code = playerswarps(player, args);
                     break;
                 default:
                     code = ReturnCode.INVALID_COMMAND;
@@ -70,25 +77,48 @@ public class Main extends JavaPlugin implements Listener {
         } else {
             code = ReturnCode.NOT_PLAYER;
         }
-        if (!code.isSuccess) {
-            sender.sendMessage(code.message);
+
+        if (code != null && code.hasMessage()) {
+            // Send the resulting message to the sender
+            sender.sendMessage(ChatColor.RED + code.getMessage(cmd));
         }
-        return code.hasValidSyntax;
+        return true;
+    }
+
+    private ReturnCode hexiwarps(Player player) {
+        player.sendMessage(ChatColor.DARK_GRAY + "- - - " +
+                ChatColor.RED + "⬢" + ChatColor.GOLD + "⬢" + ChatColor.DARK_RED + "⬢" +
+                ChatColor.WHITE + " HexiWarps " +
+                ChatColor.RED + "⬢" + ChatColor.GOLD + "⬢" + ChatColor.DARK_RED + "⬢" +
+                ChatColor.DARK_GRAY + " - - -");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/warp <warp>" + ChatColor.WHITE +
+                " - Teleport to a warp location");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/setwarp <warp>" + ChatColor.WHITE +
+                " - Creates a warp location");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/delwarp <warp>" + ChatColor.WHITE +
+                " - Deletes a warp location");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/ownedby <warp>" + ChatColor.WHITE +
+                " - Find the owner of a warp");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/listwarps [page]" + ChatColor.WHITE +
+                " - Lists all of the warps");
+        player.sendMessage(ChatColor.DARK_GRAY + "- " + ChatColor.GOLD + "/playerswarps <player> [page]" + ChatColor.WHITE +
+                " - List a player's warps");
+        return ReturnCode.SUCCESS;
     }
 
     private ReturnCode warp(Player player, String[] args) {
-        try {
-            if (args.length == 0) {
-                return mySQL.listWarps(player);
-            } else {
+        if (args.length < 1) {
+            return ReturnCode.TOO_FEW_ARGUMENTS;
+        } else {
+            try {
                 return mySQL.warp(player, args);
+            } catch (SQLException e) {
+                return mySqlError(e);
             }
-        } catch (SQLException e) {
-            return mySqlError(e);
         }
     }
 
-    private ReturnCode createWarp(Player player, String[] args) {
+    private ReturnCode setwarp(Player player, String[] args) {
         if (args.length < 1) {
             return ReturnCode.TOO_FEW_ARGUMENTS;
         } else {
@@ -100,7 +130,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    private ReturnCode delWarp(Player player, String[] args) {
+    private ReturnCode delwarp(Player player, String[] args) {
         if (args.length < 1) {
             return ReturnCode.TOO_FEW_ARGUMENTS;
         } else {
@@ -112,18 +142,6 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    private ReturnCode myWarps(Player player, String[] args) {
-        try {
-            if (args.length == 0) {
-                return mySQL.listWarps(player, player.getName());
-            } else {
-                return mySQL.listWarps(player, args[0]);
-            }
-        } catch (SQLException e) {
-            return mySqlError(e);
-        }
-    }
-
     private ReturnCode ownedBy(Player player, String[] args) {
         if (args.length < 1) {
             return ReturnCode.TOO_FEW_ARGUMENTS;
@@ -132,6 +150,38 @@ public class Main extends JavaPlugin implements Listener {
                 return mySQL.ownedBy(player, args);
             } catch (SQLException e) {
                 return mySqlError(e);
+            }
+        }
+    }
+
+    private ReturnCode listwarps(Player player, String[] args) {
+        try {
+            if (args.length == 0) {
+                return mySQL.listWarps(player, 1);
+            } else {
+                return mySQL.listWarps(player, Integer.parseInt(args[0]));
+            }
+        } catch (SQLException e) {
+            return mySqlError(e);
+        } catch (NumberFormatException e) {
+            return ReturnCode.INVALID_ARGUMENT;
+        }
+    }
+
+    private ReturnCode playerswarps(Player player, String[] args) {
+        if (args.length < 1) {
+            return ReturnCode.TOO_FEW_ARGUMENTS;
+        } else {
+            try {
+                if (args.length == 1) {
+                    return mySQL.listWarps(player, args[0], 1);
+                } else {
+                    return mySQL.listWarps(player, args[0], Integer.parseInt(args[1]));
+                }
+            } catch (SQLException e) {
+                return mySqlError(e);
+            } catch (NumberFormatException e) {
+                return ReturnCode.INVALID_ARGUMENT;
             }
         }
     }

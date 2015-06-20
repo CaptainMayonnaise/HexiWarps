@@ -3,33 +3,44 @@ main: com.hexicraft.hexiwarps.Main
 version: 1.0
 description: A warps plugin that uses permissions to manage how many warps a user is allowed to create.
 commands:
-    warp:
-        description: Teleports the player to a warp location.
-        usage: /warp [warp name]
-        permission: hexiwarps.user
-        permission-message: You don't have permission to do this.
-        aliases: [hexiwarp, hexiwarps]
-    createwarp:
-        description: Creates a warp location.
-        usage: /createwarp [warp name]
-        permission: hexiwarps.user
-        permission-message: You don't have permission to do this.
-        aliases: [setwarp]
-    delwarp:
-        description: Deletes a warp location.
-        usage: /delwarp [warp name]
-        permission: hexiwarps.user
-        permission-message: You don't have permission to do this.
-        aliases: [remwarp, rmwarp, deletewarp]
-    mywarps:
-        description: List yours, or another player's warps.
-        usage: /mywarps <player name>
-        permission: hexiwarps.user
-        permission-message: You don't have permission to do this.
-        aliases: [warps]
-    ownedby:
-        description: Find the owner of a warp.
-        usage: /ownedby [warp name]
-        permission: hexiwarps.user
-        permission-message: You don't have permission to do this.
-        aliases: [getowner, findowner, lookupowner, getcreator, findcreator, lookupcreator, createdby]
+  hexiwarps:
+    description: Displays help for the HexiWarps plugin
+    usage: /hexiwarps
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [warps]
+  warp:
+    description: Teleport to a warp location
+    usage: /warp <warp>
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+  setwarp:
+    description: Creates a warp location
+    usage: /createwarp <warp>
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [createwarp]
+  delwarp:
+    description: Deletes a warp location
+    usage: /delwarp <warp>
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [remwarp, rmwarp, deletewarp]
+  listwarps:
+    description: Lists all of the warps
+    usage: /listwarps [page]
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [allwarps, listwarp]
+  playerswarps:
+    description: List a player's warps
+    usage: /playerswarps <player> [page]
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [mywarps, mywarp, playerwarps]
+  ownedby:
+    description: Find the owner of a warp
+    usage: /ownedby <warp>
+    permission: hexiwarps.user
+    permission-message: You don't have permission to do this.
+    aliases: [getowner, findowner, lookupowner, getcreator, findcreator, lookupcreator, createdby]
